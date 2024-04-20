@@ -1,0 +1,9 @@
+{
+  "helpMessage": "Type /help or ?help command to get info about the commands and how to use them. \n Commands: \n /timer /rules /help /cancel /end /say /w // \n ?timer ?rules ?help ?cancel ?end ?say ?w ??",
+  "rulesMessage": "Rules will be updated into the Game soon.",
+  "timerMessage": "type /timer or ?timer to see the timer during a match.",
+  "AnnouncementMessage": "Please ensure all Players are Linked to AutoMuteUs and that the match is started.",
+  "wrongCommandMessage": "Wrong Command, please use one of the following commands: /timer | /help | /rules | /say",
+  "cancelMessage": "The host of the game can cancel a match at any point with the /cancel or ?cancel command followed up by a /end or ?end",
+  "impChatMessage": "Use any of the following to use the ImpostorChat, Your partners message will display in Red. \n Prefixes: // ?? /w ?w /say ?say \n Examples: \n /say message \n //message \n ?say message \n ??message \n /w message \n ?w message"
+}
