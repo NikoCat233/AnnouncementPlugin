@@ -21,8 +21,6 @@ namespace ChatAnnouncePlugin
         [EventListener]
         public void OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
-            _logger.LogInformation("Player {player} > spawned", e.PlayerControl.PlayerInfo.PlayerName);
-
             var clientPlayer = e.ClientPlayer;
             var playerControl = e.PlayerControl;
 
@@ -32,8 +30,9 @@ namespace ChatAnnouncePlugin
                 await Task.Delay(TimeSpan.FromSeconds(3));
 
                 bool messageSend = false;
-                while (clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected && !messageSend)
+                while (clientPlayer != null && clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected && playerControl.PlayerInfo != null &&!messageSend)
                 {
+                    _logger.LogDebug(clientPlayer.Game.Code + " - Chat Announce Message sent to [" + clientPlayer.Client.Id + "] " + clientPlayer.Client.Name);
                     if (!list_announced.Contains(playerControl))
                     {
                         await playerControl.SendChatToPlayerAsync(_config.AnnouncementMessage);

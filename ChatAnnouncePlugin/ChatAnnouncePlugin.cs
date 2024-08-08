@@ -1,6 +1,5 @@
 ﻿using Impostor.Api.Events.Managers;
 using Impostor.Api.Plugins;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
