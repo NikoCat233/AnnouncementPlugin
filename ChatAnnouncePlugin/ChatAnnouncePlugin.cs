@@ -10,7 +10,7 @@ namespace ChatAnnouncePlugin
     {
         private readonly ILogger<ChatAnnouncePlugin> _logger;
         private readonly IEventManager _eventManager;
-        private IDisposable _unregister;
+        private IDisposable? _unregister;
 
         private string ConfigDirectoryPath = Path.Combine(Environment.CurrentDirectory, "config");
         private const string ConfigPath = "announce.json";
@@ -22,7 +22,8 @@ namespace ChatAnnouncePlugin
             _eventManager = eventManager;
         }
 
-        public Config LoadConfig() {
+        public Config LoadConfig()
+        {
             string config_path = Path.Combine(ConfigDirectoryPath, ConfigPath);
             Config config;
 
@@ -31,10 +32,12 @@ namespace ChatAnnouncePlugin
                 WriteIndented = true
             };
 
-            if (File.Exists(config_path)) {
+            if (File.Exists(config_path))
+            {
                 config = JsonSerializer.Deserialize<Config>(File.ReadAllText(config_path));
             }
-            else {
+            else
+            {
                 config = new Config();
                 File.WriteAllText(config_path, JsonSerializer.Serialize(config, options));
             }
@@ -66,7 +69,7 @@ namespace ChatAnnouncePlugin
         public ValueTask DisableAsync()
         {
             _logger.LogInformation("ChatAnnouncePlugin is disabled.");
-            _unregister.Dispose();
+            _unregister!.Dispose();
             return default;
         }
 

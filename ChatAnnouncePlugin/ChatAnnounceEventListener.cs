@@ -2,7 +2,7 @@
 using Impostor.Api.Events;
 using Microsoft.Extensions.Logging;
 using Impostor.Api.Net.Inner.Objects;
-using System.Text;
+using Impostor.Api.Innersloth;
 
 namespace ChatAnnouncePlugin
 {
@@ -12,7 +12,7 @@ namespace ChatAnnouncePlugin
         private Config _config;
         private List<IInnerPlayerControl> list_announced = new List<IInnerPlayerControl>();
 
-        public ChatAnnounceEventListener(ILogger<ChatAnnouncePlugin> logger,Config config)
+        public ChatAnnounceEventListener(ILogger<ChatAnnouncePlugin> logger, Config config)
         {
             _logger = logger;
             _config = config;
@@ -26,29 +26,54 @@ namespace ChatAnnouncePlugin
 
             Task.Run(async () =>
             {
-                // Give the player time to load.
-                await Task.Delay(TimeSpan.FromSeconds(3));
-
-                bool messageSend = false;
-                while (clientPlayer != null && clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected && playerControl.PlayerInfo != null &&!messageSend)
+                bool messageSend()
                 {
-                    _logger.LogDebug(clientPlayer.Game.Code + " - Chat Announce Message sent to [" + clientPlayer.Client.Id + "] " + clientPlayer.Client.Name);
-                    if (!list_announced.Contains(playerControl))
+                    if (list_announced.Contains(playerControl))
                     {
-                        await playerControl.SendChatToPlayerAsync(_config.AnnouncementMessage);
+                        return true;
                     }
-                    await Task.Delay(TimeSpan.FromMilliseconds(3000));
-                    messageSend = true;
+                    return false;
+                }
+                while (clientPlayer != null && !messageSend())
+                {
+                    if (playerControl.PlayerInfo == null || playerControl.PlayerInfo.CurrentOutfit.IsIncomplete)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(200));
+                        _logger.LogDebug("Continue.");
+                        continue;
+                    }
+
+                    _logger.LogDebug(clientPlayer.Game.Code + " - Chat Announce Message sent to [" + clientPlayer.Client.Id + "] " + clientPlayer.Client.Name);
+                    string message;
+                    try
+                    {
+                        if (e.ClientPlayer.Client.Language == Language.SChinese || e.ClientPlayer.Client.Language == Language.TChinese)
+                        {
+                            message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2", e.ClientPlayer.Client.GameVersion.ToString());
+                        }
+                        else
+                        {
+                            message = string.Format(_config.AnnouncementMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2"), e.ClientPlayer.Client.GameVersion.ToString());
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        _logger.LogError(e.Message);
+                        message = "Error while running ChatAnnounceMent.";
+                    }
+
+                    _logger.LogDebug("sending " + message);
+                    await playerControl.SendChatToPlayerAsync(message);
                     list_announced.Append(playerControl);
+                    break;
                 }
             });
         }
 
         [EventListener]
-        public void onDisconnect(IPlayerDestroyedEvent e) {
-            if (list_announced.Contains(e.PlayerControl)) {
-                list_announced.Remove(e.PlayerControl);
-            }
+        public void onDisconnect(IPlayerDestroyedEvent e)
+        {
+            list_announced.Remove(e.PlayerControl);
         }
 
         [EventListener]
@@ -63,7 +88,15 @@ namespace ChatAnnouncePlugin
 
             if (command.Equals("?help"))
             {
-                string message = _config.helpMessage;
+                string message;
+                if (e.ClientPlayer.Client.Language is Language.SChinese or Language.TChinese)
+                {
+                    message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2", e.ClientPlayer.Client.GameVersion.ToString());
+                }
+                else
+                {
+                    message = string.Format(_config.helpMessage, e.ClientPlayer.Client.Name, e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2", e.ClientPlayer.Client.GameVersion.ToString());
+                }
                 await e.PlayerControl.SendChatToPlayerAsync(message);
             }
             else
@@ -71,13 +104,5 @@ namespace ChatAnnouncePlugin
                 e.IsCancelled = false;
             }
         }
-
-        private void sendMessage(IInnerPlayerControl player, string message = "") 
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.Append(message);
-            player.SendChatToPlayerAsync(builder.ToString());
-        }
-
     }
 }
