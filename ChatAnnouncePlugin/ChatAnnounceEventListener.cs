@@ -49,11 +49,11 @@ namespace ChatAnnouncePlugin
                     {
                         if (e.ClientPlayer.Client.Language == Language.SChinese || e.ClientPlayer.Client.Language == Language.TChinese)
                         {
-                            message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, (!e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2"), e.ClientPlayer.Client.GameVersion.ToString());
+                            message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
                         }
                         else
                         {
-                            message = string.Format(_config.AnnouncementMessage, e.ClientPlayer.Client.Name, (!e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2"), e.ClientPlayer.Client.GameVersion.ToString());
+                            message = string.Format(_config.AnnouncementMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
                         }
                     }
                     catch(Exception e)
@@ -91,11 +91,11 @@ namespace ChatAnnouncePlugin
                 string message;
                 if (e.ClientPlayer.Client.Language is Language.SChinese or Language.TChinese)
                 {
-                    message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, !e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2", e.ClientPlayer.Client.GameVersion.ToString());
+                    message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1", e.ClientPlayer.Client.GameVersion.ToString());
                 }
                 else
                 {
-                    message = string.Format(_config.helpMessage, e.ClientPlayer.Client.Name, !e.ClientPlayer.Client.IsSub ? "Region 1" : "Region 2", e.ClientPlayer.Client.GameVersion.ToString());
+                    message = string.Format(_config.helpMessage, e.ClientPlayer.Client.Name, e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1", e.ClientPlayer.Client.GameVersion.ToString());
                 }
                 await e.PlayerControl.SendChatToPlayerAsync(message);
             }
