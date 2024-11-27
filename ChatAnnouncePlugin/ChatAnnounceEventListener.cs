@@ -49,11 +49,11 @@ namespace ChatAnnouncePlugin
                     {
                         if (e.ClientPlayer.Client.Language == Language.SChinese || e.ClientPlayer.Client.Language == Language.TChinese)
                         {
-                            message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
+                            message = string.Format(_config.ChineseMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "No AntiCheat 无反作弊" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
                         }
                         else
                         {
-                            message = string.Format(_config.AnnouncementMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "Region 2" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
+                            message = string.Format(_config.AnnouncementMessage, e.ClientPlayer.Client.Name, (e.ClientPlayer.Client.IsSub ? "No AntiCheat 无反作弊" : "Region 1"), e.ClientPlayer.Client.GameVersion.ToString());
                         }
                     }
                     catch(Exception e)
@@ -64,6 +64,11 @@ namespace ChatAnnouncePlugin
 
                     _logger.LogDebug("sending " + message);
                     await playerControl.SendChatToPlayerAsync(message);
+
+                    if (e.ClientPlayer.Client.Language is Language.SChinese or Language.TChinese)
+                    {
+                        await playerControl.SendChatToPlayerAsync("你知道我们有中国服务器吗？\nNiko233(CN) au-cn.niko233.me\n可在 https://au.niko233.me 安装");
+                    }
                     list_announced.Append(playerControl);
                     break;
                 }
